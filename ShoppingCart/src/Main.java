@@ -2,6 +2,7 @@ import static java.lang.Math.abs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
 
@@ -29,6 +30,7 @@ class Utility {
 		}
 		return -1;
 	}
+
 }
 
 class Product {
@@ -165,27 +167,119 @@ class ShoppingCart {
 		}
 	}
 
-	double calculateTotal() {
+//	double calculateTotal() {
+//		double total = 0;
+//		for (CartItem c : cart) {
+//			total += c.getProduct().getPrice() * c.getQuantity();
+//		}
+//		return total;
+//	}
+//
+//	void checkout() throws EmptyCartException {
+//		if (cart.isEmpty()) throw new EmptyCartException();
+//
+//		for (CartItem cartItem : cart) {
+//			int quantityOrdered = cartItem.getQuantity();
+//			cartItem.getProduct().reduceStock(quantityOrdered);
+//			cartItem.getProduct().reduceReservedStock(quantityOrdered);
+//		}
+//
+//		cart.clear();
+//	}
+}
+//Checkout Manager
+class CheckoutManager{
+	private ShoppingCart shoppingcart;
+	private ArrayList<PaymentMethod> paymentMethods = new ArrayList<>();
+	public CheckoutManager(ShoppingCart shoppingcart) {
+		this.shoppingcart = shoppingcart;
+	}
+
+	public double calculateTotal() {
 		double total = 0;
-		for (CartItem c : cart) {
+		for (CartItem c : shoppingcart.cart) {
 			total += c.getProduct().getPrice() * c.getQuantity();
 		}
 		return total;
 	}
 
-	void checkout() throws EmptyCartException {
-		if (cart.isEmpty()) throw new EmptyCartException();
+	public void checkout() throws EmptyCartException {
+		if (shoppingcart.cart.isEmpty()) throw new EmptyCartException();
 
-		for (CartItem cartItem : cart) {
+		for (CartItem cartItem : shoppingcart.cart) {
 			int quantityOrdered = cartItem.getQuantity();
 			cartItem.getProduct().reduceStock(quantityOrdered);
 			cartItem.getProduct().reduceReservedStock(quantityOrdered);
 		}
 
-		cart.clear();
+		shoppingcart.cart.clear();
+	}
+
+	public void determinePaymentMethods(double total){
+		paymentMethods.clear();
+		if (total<5000)
+			paymentMethods.add(new CashOnDilivery());
+		paymentMethods.add(new CreditCard());
+		paymentMethods.add(new Easypaisa());
+	}
+	public void processOrder(){
+		double total = calculateTotal();
+		determinePaymentMethods(total);
+	}
+	public void finalizeOrder(PaymentMethod paymentMethod){
+		double total = calculateTotal();
+		if (paymentMethod.payment(total)){
+			try {
+				checkout();
+				System.out.println("Order placed successfully!");
+			} catch (EmptyCartException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+
 	}
 }
+//Payment methods
+interface PaymentMethod {
+	String getName();
+	boolean payment(double amount);
+}
+class CashOnDilivery implements PaymentMethod {
 
+	@Override
+	public String getName() {
+		return "Cash on Delivery";
+	}
+
+	@Override
+	public boolean payment(double amount) {
+		System.out.println("Payment of " + amount + " will be made upon delivery.");
+		return true;
+	}
+}
+class CreditCard implements PaymentMethod{
+	@Override
+	public String getName(){
+		return "Credit Card";
+	}
+	@Override
+	public boolean payment(double amount){
+		System.out.println("Payment of " + amount + " will be made through Credit Card.");
+		return true;
+	}
+}
+class Easypaisa implements PaymentMethod{
+	@Override
+	public String getName(){
+		return "Easypaisa";
+	}
+	@Override
+	public boolean payment(double amount){
+		System.out.println("Payment of " + amount + " will be made through Easypaisa.");
+		return true;
+	}
+}
+//Exceptions
 class ProductNotFoundException extends Exception {
 
 	public ProductNotFoundException() {
@@ -213,4 +307,5 @@ class EmptyCartException extends Exception {
 		super("cart is empty.");
 	}
 }
+
 
