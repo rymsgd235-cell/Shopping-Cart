@@ -1,0 +1,34 @@
+# ==========================================
+# JetBrains (IntelliJ, PyCharm, WebStorm)
+# ==========================================
+.idea/
+.out/
+.target/
+*.class
+*.iml
+*.iws
+*.ipr
+
+# ==========================================
+# Visual Studio Code (VS Code)
+# ==========================================
+.vscode/
+*.code-workspace
+workspace.json
+settings/
+
+# ==========================================
+# Eclipse
+# ==========================================
+.project
+.classpath
+.settings/
+*.launch
+
+
+# ==========================================
+# General System & OS Files
+# ==========================================
+.DS_Store
+Thumbs.db
+Desktop.ini

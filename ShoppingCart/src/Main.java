@@ -1,12 +1,12 @@
 import static java.lang.Math.abs;
+
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
 
 public class Main {
 
@@ -34,9 +34,9 @@ public class Main {
 		storeInventory.add(new Product(10, "HDD 1TB", 5000.0, 15));
 		storeInventory.add(new Product(11, "Wired Mouse", 300.0, 30));
 		storeInventory.add(new Product(12, "KeyBoard", 950.0, 25));
-		storeInventory.add(new Product(13,"Earbuds",1000,35));
-		storeInventory.add(new Product(14,"Type-C Cable",200,50));
-		storeInventory.add(new Product(15,"Type-B Cable",150,50));
+		storeInventory.add(new Product(13, "Earbuds", 1000, 35));
+		storeInventory.add(new Product(14, "Type-C Cable", 200, 50));
+		storeInventory.add(new Product(15, "Type-B Cable", 150, 50));
 		//Main Frame
 		frame = new JFrame("Online Shopping Cart");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,38 +51,47 @@ public class Main {
 		frame.setLocationRelativeTo(null); // Center on screen
 		frame.setVisible(true);
 	}
+
 	//setup tables for both products and cart
 	private static void setupUI() {
 		// left section: products
-		String[] productCols = {"ID", "Name", "Price (PKR)", "Available Stock"};
-		productTableModel = new DefaultTableModel(productCols, 0) {
-			@Override
-			public boolean isCellEditable(int row, int column) { return false; } // Read-only
-		};
+		String[] productCols = { "ID", "Name", "Price (PKR)", "Available Stock" };
+		productTableModel =
+			new DefaultTableModel(productCols, 0) {
+				@Override
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				} // Read-only
+			};
 		JTable productTable = new JTable(productTableModel);
 		productTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane productScroll = new JScrollPane(productTable);
 		productScroll.setBorder(BorderFactory.createTitledBorder("1. Available Products (Click to Add)"));
 
 		// Add Click Listener to Product Table
-		productTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 1) {
-					int row = productTable.getSelectedRow();
-					if (row != -1) {
-						handleProductSelection(row);
-						productTable.clearSelection(); // Deselect after clicking
+		productTable.addMouseListener(
+			new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					if (e.getClickCount() == 1) {
+						int row = productTable.getSelectedRow();
+						if (row != -1) {
+							handleProductSelection(row);
+							productTable.clearSelection(); // Deselect after clicking
+						}
 					}
 				}
 			}
-		});
+		);
 
 		//right section: User's Cart
-		String[] cartCols = {"ID", "Name", "Qty Reserved", "Subtotal"};
-		cartTableModel = new DefaultTableModel(cartCols, 0) {
-			@Override
-			public boolean isCellEditable(int row, int column) { return false; }
-		};
+		String[] cartCols = { "ID", "Name", "Qty Reserved", "Subtotal" };
+		cartTableModel =
+			new DefaultTableModel(cartCols, 0) {
+				@Override
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+			};
 		JTable cartTable = new JTable(cartTableModel);
 		JScrollPane cartScroll = new JScrollPane(cartTable);
 		cartScroll.setBorder(BorderFactory.createTitledBorder("2. Your Shopping Cart"));
@@ -117,10 +126,10 @@ public class Main {
 		Product selectedProduct = storeInventory.get(rowIndex);
 
 		String input = JOptionPane.showInputDialog(
-				frame,
-				"Enter quantity for " + selectedProduct.getName() + ":",
-				"Add to Cart",
-				JOptionPane.QUESTION_MESSAGE
+			frame,
+			"Enter quantity for " + selectedProduct.getName() + ":",
+			"Add to Cart",
+			JOptionPane.QUESTION_MESSAGE
 		);
 
 		if (input != null && !input.trim().isEmpty()) {
@@ -130,7 +139,12 @@ public class Main {
 				refreshCartTable();
 				refreshProductTable(); // Refresh to show updated reserved stock
 			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(frame, "Please enter a valid number.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(
+					frame,
+					"Please enter a valid number.",
+					"Invalid Input",
+					JOptionPane.ERROR_MESSAGE
+				);
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(frame, ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
 			}
@@ -149,14 +163,23 @@ public class Main {
 		StringBuilder invoice = new StringBuilder();
 		invoice.append("--- FINAL INVOICE ---\n\n");
 		for (CartItem item : cart.cart) {
-			invoice.append(item.getProduct().getName())
-					.append(" (x").append(item.getQuantity()).append(") = PKR ")
-					.append(item.getProduct().getPrice() * item.getQuantity()).append("\n");
+			invoice
+				.append(item.getProduct().getName())
+				.append(" (x")
+				.append(item.getQuantity())
+				.append(") = PKR ")
+				.append(item.getProduct().getPrice() * item.getQuantity())
+				.append("\n");
 		}
 		invoice.append("\nGRAND TOTAL: PKR ").append(total).append("\n\n");
 		invoice.append("Do you want to proceed to payment?");
 
-		int confirmInvoice = JOptionPane.showConfirmDialog(frame, invoice.toString(), "Invoice Details", JOptionPane.YES_NO_OPTION);
+		int confirmInvoice = JOptionPane.showConfirmDialog(
+			frame,
+			invoice.toString(),
+			"Invoice Details",
+			JOptionPane.YES_NO_OPTION
+		);
 		if (confirmInvoice != JOptionPane.YES_OPTION) return;
 
 		// determine paymentMethods
@@ -170,33 +193,36 @@ public class Main {
 
 		// paymentMethod selection
 		String selectedMethodName = (String) JOptionPane.showInputDialog(
-				frame,
-				"Total is PKR " + total + ".\nSelect your payment method:",
-				"Payment Gateway",
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				methodNames,
-				methodNames[0]
+			frame,
+			"Total is PKR " + total + ".\nSelect your payment method:",
+			"Payment Gateway",
+			JOptionPane.QUESTION_MESSAGE,
+			null,
+			methodNames,
+			methodNames[0]
 		);
 
 		if (selectedMethodName == null) return; // User cancelled
 
 		//final confirmation & processing
 		int finalConfirm = JOptionPane.showConfirmDialog(
-				frame,
-				"Confirm order using " + selectedMethodName + "?",
-				"Final Confirmation",
-				JOptionPane.YES_NO_OPTION
+			frame,
+			"Confirm order using " + selectedMethodName + "?",
+			"Final Confirmation",
+			JOptionPane.YES_NO_OPTION
 		);
 
 		if (finalConfirm == JOptionPane.YES_OPTION) {
-
 			for (PaymentMethod method : options) {
 				if (method.getName().equals(selectedMethodName)) {
 					manager.finalizeOrder(method);
 
-					JOptionPane.showMessageDialog(frame, "Order Placed Successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
+					JOptionPane.showMessageDialog(
+						frame,
+						"Order Placed Successfully!",
+						"Success",
+						JOptionPane.INFORMATION_MESSAGE
+					);
 
 					refreshProductTable();
 					refreshCartTable();
@@ -210,25 +236,18 @@ public class Main {
 		productTableModel.setRowCount(0); // Clear existing rows
 		for (Product p : storeInventory) {
 			int available = p.getStock() - p.getReservedStock();
-			productTableModel.addRow(new Object[]{
-					p.getProductId(),
-					p.getName(),
-					p.getPrice(),
-					available
-			});
+			productTableModel.addRow(new Object[] { p.getProductId(), p.getName(), p.getPrice(), available });
 		}
 	}
+
 	// Refreshes cart to show current items and total amount
 	private static void refreshCartTable() {
 		cartTableModel.setRowCount(0); // Clear existing rows
 		for (CartItem c : cart.cart) {
 			double subtotal = c.getProduct().getPrice() * c.getQuantity();
-			cartTableModel.addRow(new Object[]{
-					c.getProduct().getProductId(),
-					c.getProduct().getName(),
-					c.getQuantity(),
-					subtotal
-			});
+			cartTableModel.addRow(
+				new Object[] { c.getProduct().getProductId(), c.getProduct().getName(), c.getQuantity(), subtotal }
+			);
 		}
 		lblTotal.setText("Total Amount: PKR " + manager.calculateTotal());
 	}
@@ -243,8 +262,8 @@ class Utility {
 		}
 		return -1;
 	}
-
 }
+
 // Product class
 class Product {
 
@@ -268,9 +287,10 @@ class Product {
 		return price;
 	}
 
-	public String getName(){
+	public String getName() {
 		return name;
 	}
+
 	public int getStock() {
 		return stock;
 	}
@@ -299,6 +319,7 @@ class Product {
 		this.reservedStock -= reservedStock;
 	}
 }
+
 // CartItem
 class CartItem {
 
@@ -324,6 +345,7 @@ class CartItem {
 		this.quantity = quantity;
 	}
 }
+
 // ShoppingCart Modified contins only addProduct, removeProduct and updateQuantity methods
 // calculateTotal and checkout moved to CheckoutManager
 class ShoppingCart {
@@ -383,13 +405,15 @@ class ShoppingCart {
 			cart.get(i).getProduct().addReservedStock(cart.get(i).getQuantity());
 		}
 	}
-
 }
+
 //Checkout Manager
 // manages total, paymentMethods and checkout process
-class CheckoutManager{
+class CheckoutManager {
+
 	private ShoppingCart shoppingcart;
 	private ArrayList<PaymentMethod> paymentMethods = new ArrayList<>();
+
 	public CheckoutManager(ShoppingCart shoppingcart) {
 		this.shoppingcart = shoppingcart;
 	}
@@ -414,20 +438,21 @@ class CheckoutManager{
 		shoppingcart.cart.clear();
 	}
 
-	public void determinePaymentMethods(double total){
+	public void determinePaymentMethods(double total) {
 		paymentMethods.clear();
-		if (total<5000)
-			paymentMethods.add(new CashOnDilivery());
+		if (total < 5000) paymentMethods.add(new CashOnDilivery());
 		paymentMethods.add(new CreditCard());
 		paymentMethods.add(new Easypaisa());
 	}
-	public void processOrder(){
+
+	public void processOrder() {
 		double total = calculateTotal();
 		determinePaymentMethods(total);
 	}
-	public void finalizeOrder(PaymentMethod paymentMethod){
+
+	public void finalizeOrder(PaymentMethod paymentMethod) {
 		double total = calculateTotal();
-		if (paymentMethod.payment(total)){
+		if (paymentMethod.payment(total)) {
 			try {
 				checkout();
 				System.out.println("Order placed successfully!");
@@ -436,15 +461,18 @@ class CheckoutManager{
 			}
 		}
 	}
+
 	public ArrayList<PaymentMethod> getPaymentMethods() {
 		return paymentMethods;
 	}
 }
+
 //Payment methods interfadce
 interface PaymentMethod {
 	String getName();
 	boolean payment(double amount);
 }
+
 //CashOnDelivery
 class CashOnDilivery implements PaymentMethod {
 
@@ -459,30 +487,37 @@ class CashOnDilivery implements PaymentMethod {
 		return true;
 	}
 }
+
 //CreditCard
-class CreditCard implements PaymentMethod{
+class CreditCard implements PaymentMethod {
+
 	@Override
-	public String getName(){
+	public String getName() {
 		return "Credit Card";
 	}
+
 	@Override
-	public boolean payment(double amount){
+	public boolean payment(double amount) {
 		System.out.println("Payment of " + amount + " will be made through Credit Card.");
 		return true;
 	}
 }
+
 //Easypaisa
-class Easypaisa implements PaymentMethod{
+class Easypaisa implements PaymentMethod {
+
 	@Override
-	public String getName(){
+	public String getName() {
 		return "Easypaisa";
 	}
+
 	@Override
-	public boolean payment(double amount){
+	public boolean payment(double amount) {
 		System.out.println("Payment of " + amount + " will be made through Easypaisa.");
 		return true;
 	}
 }
+
 //Exceptions
 // when product is not found in cart
 class ProductNotFoundException extends Exception {
@@ -491,6 +526,7 @@ class ProductNotFoundException extends Exception {
 		super("Product not found");
 	}
 }
+
 // when user enters quantity more than available stock
 class InsufficientStockException extends Exception {
 
@@ -498,6 +534,7 @@ class InsufficientStockException extends Exception {
 		super("Insufficient Stocks");
 	}
 }
+
 // when user enters invalid quantity
 class InvalidQuantityException extends Exception {
 
@@ -505,6 +542,7 @@ class InvalidQuantityException extends Exception {
 		super("Invalid Quantity");
 	}
 }
+
 // when user tries to checkout with empty cart
 class EmptyCartException extends Exception {
 
@@ -512,5 +550,3 @@ class EmptyCartException extends Exception {
 		super("cart is empty.");
 	}
 }
-
-
